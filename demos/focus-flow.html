@@ -1,0 +1,473 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Focus Flow — a calm focus timer</title>
+<meta name="description" content="Focus Flow: a distraction-free focus timer with sessions, streaks, and offline support. Your data never leaves your browser." />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --bg: #05070d;
+    --card: #0b101d;
+    --border: #1b2438;
+    --text: #e7ebf5;
+    --muted: #94a0b8;
+    --accent: #818cf8;
+    --accent-2: #a78bfa;
+    --teal: #2dd4bf;
+    --amber: #fbbf24;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100svh;
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgba(129, 140, 248, 0.14), transparent 60%),
+      radial-gradient(50rem 36rem at -10% 30%, rgba(45, 212, 191, 0.08), transparent 60%),
+      var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 48px;
+  }
+  main { width: 100%; max-width: 460px; }
+
+  header.top {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%; margin-bottom: 26px;
+  }
+  .brand { font-family: var(--mono); font-size: 13px; letter-spacing: 0.12em; color: var(--muted); }
+  .brand b { color: var(--text); }
+  a.home { font-size: 12.5px; color: var(--muted); text-decoration: none; border-bottom: 1px dashed rgba(148,160,184,.4); padding-bottom: 2px; }
+  a.home:hover { color: var(--teal); border-color: var(--teal); }
+
+  .card {
+    background: rgba(11, 16, 29, 0.75);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    backdrop-filter: blur(12px);
+    padding: 26px 22px;
+  }
+
+  /* Mode chips */
+  .modes { display: flex; gap: 8px; justify-content: center; margin-bottom: 22px; }
+  .chip {
+    cursor: pointer; border: 1px solid var(--border); background: transparent;
+    color: var(--muted); font: inherit; font-size: 13px; font-weight: 600;
+    border-radius: 999px; padding: 8px 14px; transition: all .18s ease;
+  }
+  .chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #0b1120; }
+  .chip:focus-visible, .ctrl:focus-visible, .stepper button:focus-visible, a.home:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .chip:disabled { opacity: .45; cursor: not-allowed; }
+
+  /* Ring */
+  .ring-wrap { position: relative; width: min(280px, 74vw); margin: 0 auto 6px; }
+  svg.ring { display: block; width: 100%; height: auto; transform: rotate(-90deg); }
+  .ring-track { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-bar { fill: none; stroke: url(#ringgrad); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .3s linear; }
+  .time-big {
+    position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  }
+  #clock { font-family: var(--mono); font-size: clamp(44px, 13vw, 58px); font-weight: 800; letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+  #phase { font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--muted); }
+  body[data-mode="focus"] #phase { color: var(--accent-2); }
+  body[data-mode="short"] #phase, body[data-mode="long"] #phase { color: var(--teal); }
+
+  /* Controls */
+  .controls { display: flex; gap: 10px; justify-content: center; margin-top: 18px; }
+  .ctrl {
+    cursor: pointer; border-radius: 14px; font: inherit; font-weight: 700; font-size: 15px;
+    padding: 13px 22px; transition: all .15s ease;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+  }
+  .ctrl:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .ctrl:active { transform: scale(.97); }
+  .ctrl:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+  .ctrl.primary { border: 0; color: #0b1120; background: linear-gradient(100deg, var(--accent), var(--accent-2)); box-shadow: 0 8px 26px -10px rgba(129,140,248,.6); }
+  #cycles { text-align: center; margin-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  #cycles .dot { color: var(--accent-2); }
+
+  /* Settings */
+  .settings { margin-top: 22px; border-top: 1px solid var(--border); padding-top: 18px; display: grid; gap: 12px; }
+  .setting { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .setting label { font-size: 13.5px; color: var(--muted); }
+  .stepper { display: flex; align-items: center; gap: 10px; font-family: var(--mono); }
+  .stepper button {
+    cursor: pointer; width: 34px; height: 34px; border-radius: 10px; font: inherit; font-size: 18px; font-weight: 700;
+    border: 1px solid var(--border); background: transparent; color: var(--text); transition: all .15s ease;
+  }
+  .stepper button:hover { border-color: var(--teal); color: var(--teal); }
+  .stepper button:disabled { opacity: .4; cursor: not-allowed; }
+  .stepper span { min-width: 56px; text-align: center; font-size: 14px; }
+
+  /* Stats */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 22px; }
+  .stat { border: 1px solid var(--border); border-radius: 16px; padding: 14px 10px; text-align: center; background: rgba(11,16,29,.6); }
+  .stat b { display: block; font-family: var(--mono); font-size: 22px; }
+  .stat:nth-child(1) b { color: var(--accent-2); }
+  .stat:nth-child(2) b { color: var(--teal); }
+  .stat:nth-child(3) b { color: var(--amber); }
+  .stat span { font-size: 11px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+
+  /* Week chart */
+  .week { margin-top: 20px; border: 1px solid var(--border); border-radius: 18px; padding: 16px; background: rgba(11,16,29,.6); }
+  .week h2 { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; font-weight: 600; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 92px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+  .bar {
+    width: 100%; max-width: 30px; border-radius: 6px 6px 3px 3px; min-height: 4px;
+    background: linear-gradient(180deg, var(--accent-2), var(--accent));
+    transition: height .5s ease;
+  }
+  .bar-col.today .bar { background: linear-gradient(180deg, var(--teal), #0e9488); }
+  .bar-label { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .bar-col.today .bar-label { color: var(--teal); font-weight: 700; }
+
+  footer.note { margin-top: 18px; text-align: center; font-size: 12px; color: var(--muted); line-height: 1.7; }
+  kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 6px; padding: 1px 6px; }
+
+  .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring-bar, .bar, .ctrl, .chip { transition: none; }
+  }
+</style>
+</head>
+<body data-mode="focus">
+<main>
+  <header class="top">
+    <p class="brand"><b>focus</b>_flow</p>
+    <a class="home" href="/" target="_top">‹ back to portfolio</a>
+  </header>
+
+  <section class="card" aria-label="Timer">
+    <div class="modes" role="group" aria-label="Timer mode">
+      <button class="chip" id="m-focus" type="button" aria-pressed="true">Focus</button>
+      <button class="chip" id="m-short" type="button" aria-pressed="false">Short break</button>
+      <button class="chip" id="m-long" type="button" aria-pressed="false">Long break</button>
+    </div>
+
+    <div class="ring-wrap">
+      <svg class="ring" viewBox="0 0 240 240" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#818cf8" />
+            <stop offset="0.55" stop-color="#a78bfa" />
+            <stop offset="1" stop-color="#2dd4bf" />
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="120" cy="120" r="106" />
+        <circle class="ring-bar" id="ring-bar" cx="120" cy="120" r="106" stroke-dasharray="666" stroke-dashoffset="0" />
+      </svg>
+      <div class="time-big">
+        <span id="clock">25:00</span>
+        <span id="phase">focus time</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="ctrl primary" id="toggle" type="button" aria-label="Start or pause the timer">Start</button>
+      <button class="ctrl" id="reset" type="button">Reset</button>
+    </div>
+    <p id="cycles" aria-label="Completed focus cycles">Cycle 1 · <span class="dot">○ ○ ○ ○</span> until long break</p>
+
+    <div class="settings" id="settings">
+      <div class="setting">
+        <label for="adj-focus">Focus minutes</label>
+        <div class="stepper" id="adj-focus">
+          <button type="button" data-d="-5" aria-label="Decrease focus minutes">−</button>
+          <span data-val>25 min</span>
+          <button type="button" data-d="5" aria-label="Increase focus minutes">+</button>
+        </div>
+      </div>
+      <div class="setting">
+        <label for="adj-short">Short break</label>
+        <div class="stepper" id="adj-short">
+          <button type="button" data-d="-1" aria-label="Decrease short break">−</button>
+          <span data-val>5 min</span>
+          <button type="button" data-d="1" aria-label="Increase short break">+</button>
+        </div>
+      </div>
+      <div class="setting">
+        <label for="adj-long">Long break</label>
+        <div class="stepper" id="adj-long">
+          <button type="button" data-d="-5" aria-label="Decrease long break">−</button>
+          <span data-val>15 min</span>
+          <button type="button" data-d="5" aria-label="Increase long break">+</button>
+        </div>
+      </div>
+    </div>
+    <p class="sr-only" aria-live="polite" id="live-announcer"></p>
+  </section>
+
+  <section class="stats" aria-label="Statistics">
+    <div class="stat"><b id="st-today">0m</b><span>today</span></div>
+    <div class="stat"><b id="st-sessions">0</b><span>sessions</span></div>
+    <div class="stat"><b id="st-streak">0</b><span>day streak</span></div>
+  </section>
+
+  <section class="week" aria-label="Last 7 days">
+    <h2>Last 7 days</h2>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <footer class="note">
+    <p>Press <kbd>Space</kbd> to start/pause. Sessions are stored locally in your browser — nothing leaves your device.</p>
+    <p style="margin-top:6px;"><a class="home" href="/#work" target="_top">case study →</a></p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE_KEY = "focus-flow:v1";
+  var RING_LEN = 2 * Math.PI * 106;
+
+  var MODES = {
+    focus: { label: "focus time", phase: "focus time" },
+    short: { label: "short break", phase: "breathe — break" },
+    long: { label: "long break", phase: "big break — stretch" }
+  };
+
+  var state = {
+    settings: { focus: 25, short: 5, long: 15 },
+    mode: "focus",
+    remainingSec: 25 * 60,
+    running: false,
+    endAt: 0,
+    cycle: 0,           // completed focus sessions in current long-break cycle
+    log: {}             // { "2026-11-03": { minutes: n, count: n } }
+  };
+
+  try {
+    var saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved && saved.settings && saved.log) {
+      state.settings = saved.settings;
+      state.log = saved.log;
+      state.cycle = saved.cycle || 0;
+    }
+  } catch (e) {}
+
+  var $ = function (id) { return document.getElementById(id); };
+  var clockEl = $("clock"), ringEl = $("ring-bar"), phaseEl = $("phase");
+  var toggleBtn = $("toggle"), liveEl = $("live-announcer");
+
+  ringEl.setAttribute("stroke-dasharray", String(RING_LEN));
+
+  function persist() {
+    try {
+      localStorage.setItem(STORE_KEY, JSON.stringify({
+        settings: state.settings, log: state.log, cycle: state.cycle
+      }));
+    } catch (e) {}
+  }
+
+  function totalFor(mode) { return state.settings[mode] * 60; }
+
+  function dateKey(offset) {
+    var d = new Date();
+    if (offset) d.setDate(d.getDate() + offset);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function fmtClock(sec) {
+    var m = Math.floor(sec / 60), s = sec % 60;
+    return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+
+  function updateClockUI() {
+    var txt = fmtClock(state.remainingSec);
+    clockEl.textContent = txt;
+    ringEl.setAttribute("stroke-dashoffset",
+      String(RING_LEN * (1 - state.remainingSec / totalFor(state.mode))));
+    if (state.running) {
+      document.title = txt + " · " + MODES[state.mode].label + " — Focus Flow";
+    }
+  }
+
+  var audioCtx = null;
+  function beep() {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      [523.25, 783.99].forEach(function (freq, i) {
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime + i * 0.22);
+        gain.gain.exponentialRampToValueAtTime(0.18, audioCtx.currentTime + i * 0.22 + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + i * 0.22 + 0.2);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(audioCtx.currentTime + i * 0.22);
+        osc.stop(audioCtx.currentTime + i * 0.22 + 0.24);
+      });
+    } catch (e) {}
+  }
+
+  function announce(msg) { liveEl.textContent = msg; }
+
+  function setMode(mode, autoStart) {
+    state.mode = mode;
+    state.remainingSec = totalFor(mode);
+    state.running = false;
+    document.body.dataset.mode = mode;
+    document.title = "Focus Flow — a calm focus timer";
+    ["focus", "short", "long"].forEach(function (m) {
+      $("m-" + m).setAttribute("aria-pressed", String(m === mode));
+    });
+    toggleBtn.textContent = "Start";
+    phaseEl.textContent = MODES[mode].phase;
+    updateClockUI();
+    if (autoStart) setTimeout(function () { setRunning(true); }, 900);
+  }
+
+  function setRunning(run) {
+    if (run) {
+      state.running = true;
+      state.endAt = Date.now() + state.remainingSec * 1000;
+      toggleBtn.textContent = "Pause";
+    } else {
+      state.running = false;
+      toggleBtn.textContent = "Start";
+      updateClockUI();
+    }
+  }
+
+  function completeSession() {
+    var finished = state.mode;
+    beep();
+    if (finished === "focus") {
+      var key = dateKey();
+      var entry = state.log[key] || { minutes: 0, count: 0 };
+      entry.minutes += state.settings.focus;
+      entry.count += 1;
+      state.log[key] = entry;
+      state.cycle = (state.cycle + 1) % 4;
+      announce("Focus session complete. Time for a " + (state.cycle === 0 ? "long" : "short") + " break.");
+      renderStats();
+      persist();
+      setMode(state.cycle === 0 ? "long" : "short", true);
+    } else {
+      announce("Break over. Back to focus.");
+      persist();
+      setMode("focus", true);
+    }
+  }
+
+  setInterval(function () {
+    if (!state.running) return;
+    var left = Math.max(0, Math.round((state.endAt - Date.now()) / 1000));
+    if (left !== state.remainingSec) {
+      state.remainingSec = left;
+      updateClockUI();
+    }
+    if (left <= 0) {
+      state.running = false;
+      toggleBtn.textContent = "Start";
+      completeSession();
+    }
+  }, 250);
+
+  /* Controls */
+  toggleBtn.addEventListener("click", function () { setRunning(!state.running); });
+  $("reset").addEventListener("click", function () { setMode(state.mode); });
+  ["focus", "short", "long"].forEach(function (m) {
+    $("m-" + m).addEventListener("click", function () { setMode(m); });
+  });
+  window.addEventListener("keydown", function (e) {
+    if (e.code === "Space" && !e.target.closest("button")) {
+      e.preventDefault();
+      setRunning(!state.running);
+    }
+  });
+
+  /* Settings steppers */
+  function bindStepper(id, key, min, max) {
+    var box = $(id);
+    var label = box.querySelector("[data-val]");
+    var buttons = box.querySelectorAll("button");
+    buttons.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        if (state.running) return;
+        var next = state.settings[key] + Number(btn.dataset.d);
+        state.settings[key] = Math.max(min, Math.min(max, next));
+        label.textContent = state.settings[key] + " min";
+        persist();
+        if (!state.running) setMode(state.mode);
+      });
+    });
+  }
+  bindStepper("adj-focus", "focus", 5, 90);
+  bindStepper("adj-short", "short", 1, 30);
+  bindStepper("adj-long", "long", 5, 60);
+
+  document.getElementById("settings").addEventListener("click", function () {
+    if (!state.running) refreshStepperLabels();
+  });
+  function refreshStepperLabels() {
+    $("adj-focus").querySelector("[data-val]").textContent = state.settings.focus + " min";
+    $("adj-short").querySelector("[data-val]").textContent = state.settings.short + " min";
+    $("adj-long").querySelector("[data-val]").textContent = state.settings.long + " min";
+  }
+
+  /* Stats */
+  function renderStats() {
+    var today = state.log[dateKey()] || { minutes: 0, count: 0 };
+    $("st-today").textContent = today.minutes + "m";
+
+    var totalSessions = Object.keys(state.log).reduce(function (sum, k) {
+      return sum + state.log[k].count;
+    }, 0);
+    $("st-sessions").textContent = totalSessions;
+
+    var streak = 0;
+    var startOffset = today.count > 0 ? 0 : -1;
+    while (true) {
+      var e = state.log[dateKey(startOffset - streak)];
+      if (e && e.count > 0) streak++; else break;
+      if (streak > 3650) break;
+    }
+    $("st-streak").textContent = streak;
+
+    var dots = "";
+    for (var i = 0; i < 4; i++) dots += (i < state.cycle ? "●" : "○") + (i < 3 ? " " : "");
+    $("cycles").innerHTML = "Cycle " + (state.cycle + 1) + " of 4 · <span class=\"dot\">" + dots + "</span> until long break";
+
+    /* 7-day chart */
+    var bars = $("bars");
+    bars.innerHTML = "";
+    var days = [];
+    for (i = 6; i >= 0; i--) {
+      var key2 = dateKey(-i);
+      days.push({ key: key2, data: state.log[key2] || { minutes: 0 } });
+    }
+    var max = Math.max(30, Math.max.apply(null, days.map(function (d) { return d.data.minutes; })));
+    var names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    days.forEach(function (d, idx) {
+      var col = document.createElement("div");
+      col.className = "bar-col" + (idx === 6 ? " today" : "");
+      var h = Math.round((d.data.minutes / max) * 72) + 4;
+      var bar = document.createElement("div");
+      bar.className = "bar";
+      bar.style.height = h + "px";
+      bar.setAttribute("title", d.data.minutes + " min");
+      var lbl = document.createElement("div");
+      lbl.className = "bar-label";
+      lbl.textContent = names[new Date(d.key + "T12:00:00").getDay()];
+      col.appendChild(bar);
+      col.appendChild(lbl);
+      bars.appendChild(col);
+    });
+  }
+
+  /* Init */
+  refreshStepperLabels();
+  setMode("focus");
+  renderStats();
+})();
+</script>
+</body>
+</html>

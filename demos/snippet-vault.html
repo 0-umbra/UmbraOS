@@ -1,0 +1,547 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Snippet Vault — keyboard-first code snippets</title>
+<meta name="description" content="Snippet Vault: a fast, local-first snippet manager with fuzzy search, syntax highlighting, and JSON import/export." />
+<link rel="icon" href="/icon.svg" type="image/svg+xml" />
+<style>
+  :root {
+    --bg: #05070d; --card: #0b101d; --border: #1b2438;
+    --text: #e7ebf5; --muted: #94a0b8;
+    --accent: #818cf8; --accent-2: #a78bfa; --teal: #2dd4bf; --red: #f87171;
+    --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    min-height: 100svh;
+    background:
+      radial-gradient(60rem 40rem at 85% -10%, rgba(129,140,248,.13), transparent 60%),
+      radial-gradient(50rem 36rem at -10% 30%, rgba(45,212,191,.07), transparent 60%),
+      var(--bg);
+    color: var(--text); font-family: var(--sans);
+    padding: 20px 16px 44px;
+  }
+  .app { max-width: 1060px; margin: 0 auto; }
+
+  .top { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .brand { font-family: var(--mono); font-size: 14px; letter-spacing: .1em; color: var(--muted); }
+  .brand b { color: var(--text); }
+  .top-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  a.home { font-size: 12.5px; color: var(--muted); text-decoration: none; border-bottom: 1px dashed rgba(148,160,184,.4); padding-bottom: 2px; }
+  a.home:hover { color: var(--teal); border-color: var(--teal); }
+
+  .btn {
+    cursor: pointer; border: 1px solid var(--border); background: var(--card); color: var(--text);
+    font: inherit; font-size: 13px; font-weight: 600; border-radius: 11px; padding: 9px 14px;
+    transition: all .15s ease; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { border: 0; background: linear-gradient(100deg, var(--accent), var(--accent-2)); color: #0b1120; font-weight: 700; }
+  .btn.danger:hover { border-color: var(--red); color: var(--red); }
+  .btn:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 16px; }
+  @media (max-width: 880px) { .layout { grid-template-columns: 1fr; } }
+
+  .panel { background: rgba(11,16,29,.78); border: 1px solid var(--border); border-radius: 18px; backdrop-filter: blur(10px); }
+  .sidebar { padding: 14px; display: flex; flex-direction: column; gap: 12px; max-height: calc(100svh - 130px); }
+  @media (max-width: 880px) { .sidebar { max-height: none; } }
+
+  .search-wrap { position: relative; }
+  .search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--muted); }
+  #search {
+    width: 100%; border: 1px solid var(--border); background: #080c18; color: var(--text);
+    border-radius: 11px; padding: 10px 12px 10px 36px; font: inherit; font-size: 14px;
+  }
+  #search::placeholder { color: rgba(148,160,184,.6); }
+  kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; color: var(--muted); }
+  .search-hint { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); }
+
+  #list { list-style: none; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+  @media (max-width: 880px) { #list { max-height: 300px; } }
+  .item {
+    cursor: pointer; text-align: left; width: 100%;
+    border: 1px solid var(--border); background: transparent; color: var(--text);
+    border-radius: 13px; padding: 11px 12px; font: inherit; transition: all .14s ease;
+  }
+  .item:hover { border-color: rgba(129,140,248,.55); }
+  .item[aria-current="true"] { border-color: var(--accent); background: rgba(129,140,248,.1); }
+  .item .t { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 5px; }
+  .item .meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .lang-badge { font-family: var(--mono); font-size: 10px; border-radius: 6px; padding: 2px 7px; background: rgba(45,212,191,.12); color: var(--teal); border: 1px solid rgba(45,212,191,.3); }
+  .tag-mini { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+  .empty-list { color: var(--muted); font-size: 13px; text-align: center; padding: 26px 8px; line-height: 1.6; }
+
+  .viewer { display: flex; flex-direction: column; min-height: 460px; }
+  .viewer-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; justify-content: space-between; padding: 16px 16px 12px; border-bottom: 1px solid var(--border); }
+  .viewer-title h1 { font-size: 17px; }
+  .viewer-title .tags { margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .viewer-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  pre.code {
+    flex: 1; overflow: auto; padding: 16px 18px; margin: 0;
+    font-family: var(--mono); font-size: 13px; line-height: 1.75; tab-size: 2;
+  }
+  .tok-c { color: #5b6b8c; font-style: italic; }   /* comments */
+  .tok-s { color: #86efac; }                        /* strings  */
+  .tok-k { color: #c4b5fd; }                        /* keywords */
+  .tok-n { color: #fbbf24; }                        /* numbers  */
+  .tok-t { color: #67e8f9; }                        /* tags/properties */
+
+  .form { padding: 16px; display: grid; gap: 12px; }
+  .form label { display: grid; gap: 6px; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+  .form input, .form select, .form textarea {
+    border: 1px solid var(--border); background: #080c18; color: var(--text);
+    border-radius: 11px; padding: 10px 12px; font: inherit; font-size: 14px; width: 100%;
+  }
+  .form textarea { font-family: var(--mono); font-size: 13px; min-height: 220px; resize: vertical; line-height: 1.7; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+  .form-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+  #toast {
+    position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+    background: #101a30; border: 1px solid rgba(129,140,248,.4); color: var(--text);
+    border-radius: 12px; padding: 10px 18px; font-family: var(--mono); font-size: 13px;
+    opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 50;
+    box-shadow: 0 16px 40px -18px rgba(0,0,0,.8);
+  }
+  #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .foot { margin-top: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: 12px; }
+  .foot .links { display: flex; gap: 14px; }
+  @media (prefers-reduced-motion: reduce) { .btn, #toast { transition: none; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top">
+    <p class="brand"><b>snippet</b>_vault</p>
+    <div class="top-actions">
+      <button class="btn" id="export-btn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></svg>Export</button>
+      <button class="btn" id="import-btn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 21V9m0 0 4 4m-4-4-4 4M4 7V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v2"/></svg>Import</button>
+      <input type="file" id="import-file" accept="application/json" hidden />
+      <button class="btn primary" id="new-btn" type="button">+ New snippet</button>
+      <a class="home" href="/" target="_top" style="align-self:center;">‹ portfolio</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="panel sidebar" aria-label="Snippet list">
+      <div class="search-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search" type="text" placeholder="Search vault…" autocomplete="off" aria-label="Search snippets" />
+        <span class="search-hint"><kbd>/</kbd></span>
+      </div>
+      <ul id="list"></ul>
+    </aside>
+
+    <section class="panel viewer" id="viewer" aria-live="polite"></section>
+  </div>
+
+  <div class="foot">
+    <span id="count"></span>
+    <span class="links">
+      <span>Stored locally · <kbd>/</kbd> search · <kbd>Enter</kbd> copy</span>
+      <a class="home" href="/#work" target="_top">case study →</a>
+    </span>
+  </div>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STORE_KEY = "snippet-vault:v1";
+  var $ = function (id) { return document.getElementById(id); };
+
+  var SEEDS = [
+    {
+      id: "seed-debounce",
+      title: "Debounce a function",
+      language: "JavaScript",
+      tags: ["async", "performance"],
+      code: "// Run `fn` only after `wait` ms of silence.\nfunction debounce(fn, wait = 300) {\n  let id;\n  return (...args) => {\n    clearTimeout(id);\n    id = setTimeout(() => fn(...args), wait);\n  };\n}\n\n// usage\nconst onType = debounce(q => search(q), 250);\ninput.addEventListener(\"input\", e => onType(e.target.value));"
+    },
+    {
+      id: "seed-clamp",
+      title: "Clamp a number",
+      language: "TypeScript",
+      tags: ["math", "utils"],
+      code: "// Keep a value inside [min, max] — perfect for sliders & progress.\nexport function clamp(value: number, min: number, max: number): number {\n  return Math.min(Math.max(value, min), max);\n}\n\nclamp(120, 0, 100); // 100\nclamp(-4, 0, 100);  // 0"
+    },
+    {
+      id: "seed-center",
+      title: "Perfect centering (grid)",
+      language: "CSS",
+      tags: ["layout", "grid"],
+      code: "/* Two lines. Every time. */\n.center {\n  display: grid;\n  place-items: center;\n}\n\n/* Bonus: horizontal-only */\n.center-x {\n  display: grid;\n  justify-items: center;\n}"
+    },
+    {
+      id: "seed-fetch",
+      title: "fetch() with a timeout",
+      language: "JavaScript",
+      tags: ["fetch", "api", "async"],
+      code: "// Abort a slow request instead of hanging forever.\nasync function fetchJSON(url, { timeout = 8000, ...options } = {}) {\n  const controller = new AbortController();\n  const id = setTimeout(() => controller.abort(), timeout);\n  try {\n    const res = await fetch(url, { ...options, signal: controller.signal });\n    if (!res.ok) throw new Error(`HTTP ${res.status}`);\n    return await res.json();\n  } finally {\n    clearTimeout(id);\n  }\n}"
+    },
+    {
+      id: "seed-bytes",
+      title: "Human-readable file sizes",
+      language: "JavaScript",
+      tags: ["format", "utils"],
+      code: "function formatBytes(bytes, decimals = 1) {\n  if (bytes === 0) return \"0 B\";\n  const k = 1024;\n  const units = [\"B\", \"KB\", \"MB\", \"GB\", \"TB\"];\n  const i = Math.floor(Math.log(bytes) / Math.log(k));\n  return (bytes / Math.pow(k, i)).toFixed(decimals) + \" \" + units[i];\n}\n\nformatBytes(2531204); // \"2.4 MB\""
+    },
+    {
+      id: "seed-motion",
+      title: "prefers-reduced-motion media query",
+      language: "CSS",
+      tags: ["a11y", "animation"],
+      code: "/* Respect the visitor's motion preferences. */\n@media (prefers-reduced-motion: reduce) {\n  *,\n  *::before,\n  *::after {\n    animation-duration: 0.01ms !important;\n    animation-iteration-count: 1 !important;\n    transition-duration: 0.01ms !important;\n  }\n}"
+    }
+  ];
+
+  function load() {
+    try {
+      var data = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (Array.isArray(data) && data.length) return data;
+    } catch (e) {}
+    return null;
+  }
+  var snippets = load();
+  if (!snippets) {
+    snippets = SEEDS.map(function (s) {
+      return Object.assign({}, s, { updated: Date.now() });
+    });
+    save();
+  }
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(snippets)); } catch (e) {}
+  }
+
+  var state = { query: "", selectedId: snippets[0] ? snippets[0].id : null, mode: "view" };
+  var editId = null;
+
+  /* ── Highlighting ─────────────────────────────────────── */
+  function esc(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+  var KEYWORDS = "const|let|var|function|return|if|else|for|while|do|new|class|import|export|from|default|await|async|try|catch|finally|throw|typeof|instanceof|of|in|true|false|null|undefined|this|extends|super|switch|case|break|continue|delete|yield|static|get|set|type|interface|enum|string|number|boolean|void|public|private|readonly|function\\b";
+  var rxMarkup = /(<!--[\s\S]*?-->)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(&lt;\/?[a-zA-Z][\w-]*|\/?&gt;|\s[a-zA-Z-]+(?==))/g;
+  var rxStyle = /(\/\*[\s\S]*?\*\/)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|(@[\w-]+)|([a-zA-Z-]+(?=\s*:))|(\b\d+(?:\.\d+)?(?:px|rem|em|%|s|ms|vh|vw|fr)?\b)/g;
+  var rxScriptFn = function (kwOnlyCommentPound) {
+    return new RegExp(
+      "(\\/\\*[\\s\\S]*?\\*\\/|\\/\\/[^\\n]*" + (kwOnlyCommentPound ? "|#[^\\n]*" : "") + ")" +
+      "|(\"(?:[^\"\\\\\\n]|\\\\.)*\"|'(?:[^'\\\\\\n]|\\\\.)*'|`(?:[^`\\\\]|\\\\.)*`)" +
+      "|\\b(" + KEYWORDS + ")\\b|\\b(\\d+(?:\\.\\d+)?)\\b", "g");
+  };
+  var rxScript = rxScriptFn(false);
+  var rxBash = rxScriptFn(true);
+
+  function highlight(code, lang) {
+    var escaped = esc(code);
+    var l = (lang || "").toLowerCase();
+    var rul = function (match, g1, g2, g3, g4, g5) {
+      if (g1) return '<span class="tok-c">' + g1 + "</span>";
+      if (g2) return '<span class="tok-s">' + g2 + "</span>";
+      if (g3) return '<span class="tok-k">' + g3 + "</span>";
+      if (g4) return '<span class="tok-n">' + g4 + "</span>";
+      return match;
+    };
+    if (l === "html" || l === "markup" || l === "xml") {
+      return escaped.replace(rxMarkup, function (m, c, s, t) {
+        if (c) return '<span class="tok-c">' + c + "</span>";
+        if (s) return '<span class="tok-s">' + s + "</span>";
+        if (t) return '<span class="tok-t">' + t + "</span>";
+        return m;
+      });
+    }
+    if (l === "css" || l === "scss" || l === "less") {
+      return escaped.replace(rxStyle, function (m, c, s, at, prop, num) {
+        if (c) return '<span class="tok-c">' + c + "</span>";
+        if (s) return '<span class="tok-s">' + s + "</span>";
+        if (at) return '<span class="tok-k">' + at + "</span>";
+        if (prop) return '<span class="tok-t">' + prop + "</span>";
+        if (num) return '<span class="tok-n">' + num + "</span>";
+        return m;
+      });
+    }
+    if (l === "bash" || l === "sh" || l === "shell" || l === "zsh") {
+      return escaped.replace(rxBash, rul);
+    }
+    return escaped.replace(rxScript, function (m, c, s, k, n) {
+      if (c) return '<span class="tok-c">' + c + "</span>";
+      if (s) return '<span class="tok-s">' + s + "</span>";
+      if (k) return '<span class="tok-k">' + k + "</span>";
+      if (n) return '<span class="tok-n">' + n + "</span>";
+      return m;
+    });
+  }
+
+  /* ── Search ───────────────────────────────────────────── */
+  function filtered() {
+    var q = state.query.trim().toLowerCase();
+    var list = snippets.slice().sort(function (a, b) { return b.updated - a.updated; });
+    if (!q) return list;
+    var terms = q.split(/\s+/);
+    return list.map(function (s) {
+      var score = 0;
+      var title = s.title.toLowerCase();
+      var tags = s.tags.join(" ").toLowerCase();
+      var lang = s.language.toLowerCase();
+      var code = s.code.toLowerCase();
+      for (var i = 0; i < terms.length; i++) {
+        var t = terms[i];
+        if (title.includes(t)) score += 4;
+        else if (tags.includes(t)) score += 3;
+        else if (lang.includes(t)) score += 2;
+        else if (code.includes(t)) score += 1;
+        else return { s: s, score: -1 };
+      }
+      return { s: s, score: score };
+    }).filter(function (r) { return r.score > 0; })
+      .sort(function (a, b) { return b.score - a.score; })
+      .map(function (r) { return r.s; });
+  }
+
+  function getSelected() {
+    return snippets.find(function (s) { return s.id === state.selectedId; }) || null;
+  }
+
+  /* ── Toast ────────────────────────────────────────────── */
+  var toastTimer = 0;
+  function toast(msg) {
+    var el = $("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { el.classList.remove("show"); }, 1800);
+  }
+
+  /* ── Render: list ─────────────────────────────────────── */
+  function renderList() {
+    var list = filtered();
+    var ul = $("list");
+    ul.innerHTML = "";
+    if (!list.length) {
+      ul.innerHTML = '<li class="empty-list">No snippets match.<br/>Try a different keyword.</li>';
+    }
+    list.forEach(function (s) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.className = "item";
+      btn.type = "button";
+      btn.setAttribute("aria-current", String(s.id === state.selectedId));
+      btn.innerHTML =
+        '<span class="t">' + esc(s.title) + "</span>" +
+        '<span class="meta"><span class="lang-badge">' + esc(s.language) + "</span>" +
+        s.tags.map(function (t) { return '<span class="tag-mini">#' + esc(t) + "</span>"; }).join("") +
+        "</span>";
+      btn.addEventListener("click", function () {
+        state.selectedId = s.id;
+        state.mode = "view";
+        render();
+      });
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    $("count").textContent = list.length + " of " + snippets.length + " snippets";
+  }
+
+  /* ── Render: viewer ───────────────────────────────────── */
+  function tagChips(s) {
+    return s.tags.map(function (t) { return '<span class="tag-mini">#' + esc(t) + "</span>"; }).join("");
+  }
+
+  function renderViewer() {
+    var box = $("viewer");
+    var s = getSelected();
+
+    if (state.mode === "edit" || state.mode === "new") {
+      var editing = state.mode === "edit" ? getSelected() : null;
+      box.innerHTML =
+        '<form class="form" id="snippet-form">' +
+        '<div class="form-row">' +
+        "<label>Title<input name=\"title\" required maxlength=\"80\" value=\"" + esc(editing ? editing.title : "") + "\" placeholder=\"e.g. Debounce a function\" /></label>" +
+        "<label>Language<select name=\"language\">" +
+        ["JavaScript", "TypeScript", "CSS", "HTML", "Bash", "JSON", "Other"].map(function (l) {
+          return "<option" + (editing && editing.language === l ? " selected" : "") + ">" + l + "</option>";
+        }).join("") +
+        "</select></label>" +
+        "</div>" +
+        "<label>Tags <span style=\"font-weight:400\">(comma separated)</span><input name=\"tags\" value=\"" + esc(editing ? editing.tags.join(", ") : "") + "\" placeholder=\"utils, async\" /></label>" +
+        "<label>Code<textarea name=\"code\" required spellcheck=\"false\" placeholder=\"Paste your snippet…\">" + esc(editing ? editing.code : "") + "</textarea></label>" +
+        '<div class="form-actions">' +
+        '<button class="btn" type="button" id="cancel-form">Cancel</button>' +
+        '<button class="btn primary" type="submit">' + (editing ? "Save changes" : "Add snippet") + "</button>" +
+        "</div></form>";
+
+      $("cancel-form").addEventListener("click", function () {
+        state.mode = "view";
+        if (state.mode === "new" && !getSelected()) state.selectedId = snippets[0] ? snippets[0].id : null;
+        render();
+      });
+      $("snippet-form").addEventListener("submit", function (e) {
+        e.preventDefault();
+        var fd = new FormData(e.target);
+        var tags = String(fd.get("tags") || "").split(",").map(function (t) { return t.trim(); }).filter(Boolean);
+        if (state.mode === "edit" && editing) {
+          editing.title = String(fd.get("title")).trim() || "Untitled";
+          editing.language = String(fd.get("language"));
+          editing.tags = tags;
+          editing.code = String(fd.get("code"));
+          editing.updated = Date.now();
+          toast("Snippet updated");
+        } else {
+          var item = {
+            id: "s" + Date.now().toString(36) + Math.floor(Math.random() * 999),
+            title: String(fd.get("title")).trim() || "Untitled",
+            language: String(fd.get("language")),
+            tags: tags,
+            code: String(fd.get("code")),
+            updated: Date.now()
+          };
+          snippets.unshift(item);
+          state.selectedId = item.id;
+          toast("Snippet added");
+        }
+        state.mode = "view";
+        save();
+        render();
+      });
+      return;
+    }
+
+    if (!s) {
+      box.innerHTML = '<div class="empty-list" style="flex:1;display:flex;align-items:center;justify-content:center;">The vault is empty.<br/>Create your first snippet with “+ New snippet”.</div>';
+      return;
+    }
+
+    box.innerHTML =
+      '<header class="viewer-head">' +
+      '<div class="viewer-title"><h1>' + esc(s.title) + '</h1>' +
+      '<div class="tags"><span class="lang-badge">' + esc(s.language) + "</span>" + tagChips(s) + "</div></div>" +
+      '<div class="viewer-actions">' +
+      '<button class="btn" id="copy-btn" type="button"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>Copy</button>' +
+      '<button class="btn" id="edit-btn" type="button">Edit</button>' +
+      '<button class="btn danger" id="delete-btn" type="button">Delete</button>' +
+      "</div></header>" +
+      '<pre class="code"><code id="code-block">' + highlight(s.code, s.language) + "</code></pre>";
+
+    $("copy-btn").addEventListener("click", function () { copyCode(s); });
+    $("edit-btn").addEventListener("click", function () { state.mode = "edit"; render(); });
+    $("delete-btn").addEventListener("click", function () {
+      if (!confirm("Delete “" + s.title + "”? This cannot be undone.")) return;
+      snippets = snippets.filter(function (x) { return x.id !== s.id; });
+      state.selectedId = snippets[0] ? snippets[0].id : null;
+      save();
+      toast("Snippet deleted");
+      render();
+    });
+  }
+
+  function copyCode(s) {
+    var done = function () { toast("Copied to clipboard"); };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(s.code).then(done, function () { fallbackCopy(s.code, done); });
+    } else {
+      fallbackCopy(s.code, done);
+    }
+  }
+  function fallbackCopy(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { toast("Copy failed — select manually"); }
+    document.body.removeChild(ta);
+  }
+
+  /* ── Import / Export ──────────────────────────────────── */
+  $("export-btn").addEventListener("click", function () {
+    var blob = new Blob([JSON.stringify(snippets, null, 2)], { type: "application/json" });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = "snippet-vault.json";
+    a.click();
+    URL.revokeObjectURL(url);
+    toast("Exported " + snippets.length + " snippets");
+  });
+  $("import-btn").addEventListener("click", function () { $("import-file").click(); });
+  $("import-file").addEventListener("change", function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      try {
+        var data = JSON.parse(String(reader.result));
+        if (!Array.isArray(data)) throw new Error("not an array");
+        var added = 0;
+        data.forEach(function (item) {
+          if (item && typeof item.title === "string" && typeof item.code === "string") {
+            snippets.unshift({
+              id: item.id && !snippets.some(function (x) { return x.id === item.id; })
+                ? item.id
+                : "s" + Date.now().toString(36) + Math.floor(Math.random() * 9999) + added,
+              title: item.title,
+              language: typeof item.language === "string" ? item.language : "Other",
+              tags: Array.isArray(item.tags) ? item.tags.map(String) : [],
+              code: item.code,
+              updated: Date.now()
+            });
+            added++;
+          }
+        });
+        state.selectedId = snippets[0] ? snippets[0].id : null;
+        save();
+        toast("Imported " + added + " snippets");
+        render();
+      } catch (err) {
+        toast("Import failed — invalid JSON");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+  });
+
+  /* ── New + keyboard ───────────────────────────────────── */
+  $("new-btn").addEventListener("click", function () {
+    state.mode = "new";
+    renderViewer();
+    var input = document.querySelector("#snippet-form input[name=title]");
+    if (input) input.focus();
+  });
+
+  window.addEventListener("keydown", function (e) {
+    if (e.key === "/" && document.activeElement !== $("search") && !document.activeElement.closest("input,textarea,select")) {
+      e.preventDefault();
+      $("search").focus();
+    }
+    if (e.key === "Enter" && document.activeElement === document.body) {
+      var s = getSelected();
+      if (s && state.mode === "view") copyCode(s);
+    }
+  });
+
+  $("search").addEventListener("input", function (e) {
+    state.query = e.target.value;
+    renderList();
+  });
+
+  function render() {
+    renderList();
+    renderViewer();
+  }
+  render();
+})();
+</script>
+</body>
+</html>
