@@ -5,14 +5,14 @@
 
 const CONFIG = {
   // EDIT: your public contact email
-  email: "hello@example.com",
+  email: "mehrablone300@gmail.com",
 
   // EDIT: your GitHub username (project source buttons use it)
-  githubUser: "your-github-username",
+  githubUser: "0-umbra",
 
   // EDIT: social links. Leave a value as "" to hide that link.
   socials: {
-    GitHub: "https://github.com/your-github-username",
+    GitHub: "https://github.com/0-umbra",
     YouTube: "",
     Twitch: "",
     Discord: "",
@@ -21,7 +21,7 @@ const CONFIG = {
   },
 
   // EDIT: the games you're playing right now
-  playing: ["Minecraft", "Valorant", "Elden Ring", "Hollow Knight"]
+  playing: ["Minecraft", "Valorant", "PUBG", "Call Of Duty]
 };
 
 /* ═══════════════════════════════════════════════════════════
