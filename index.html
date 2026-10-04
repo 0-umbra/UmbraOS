@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Umbra — web, app and game developer</title>
+  <meta name="description" content="Umbra is a developer and content creator building websites, apps and games. Play the demos, read the work, get in touch." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#08080f" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://umbra.is-a.dev/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Umbra — web, app and game developer" />
+  <meta property="og:description" content="Websites, apps and games, built in the dark and shipped in the light. Play the demos right on the page." />
+  <meta property="og:url" content="https://umbra.is-a.dev/" />
+  <meta name="twitter:card" content="summary" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Umbra, back to top">
+      <svg width="26" height="26" viewBox="0 0 64 64" aria-hidden="true">
+        <circle cx="32" cy="32" r="22" fill="var(--corona)"/>
+        <circle cx="40" cy="28" r="21" fill="var(--night)"/>
+      </svg>
+      <span>umbra</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#play">Play</a>
+      <a href="#work">Work</a>
+      <a href="#craft">What I make</a>
+      <a href="#about">About</a>
+      <a href="#contact" class="nav-cta">Contact</a>
+    </nav>
+  </header>
+
+  <main id="main">
+
+    <!-- ───────────── Hero ───────────── -->
+    <section class="hero" aria-labelledby="hero-title">
+      <canvas id="eclipse" aria-hidden="true"></canvas>
+      <div class="hero-copy">
+        <p class="hero-kicker"><span class="dot" aria-hidden="true"></span> Open for freelance and collabs</p>
+        <h1 id="hero-title">I'm Umbra. I build things in the dark and ship them in the light.</h1>
+        <p class="hero-lede">Websites, apps and games, made by a developer who also plays too much, streams a bit and records the process. Everything below runs in your browser. Try it.</p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#play">Play a game I made</a>
+          <a class="btn btn-ghost" href="#work">See the work</a>
+        </div>
+      </div>
+      <p class="hero-hint" id="hero-hint">Move your cursor to move the moon.</p>
+    </section>
+
+    <!-- ───────────── Play ───────────── -->
+    <section class="section play" id="play" aria-labelledby="play-title">
+      <div class="section-head">
+        <h2 id="play-title">Skip the résumé, play the game</h2>
+        <p>Neon Drift is a one-button drift racer I wrote on the Canvas API. Hold to drift right, let go to drift left. Space bar works too.</p>
+      </div>
+
+      <div class="console">
+        <div class="console-bar">
+          <span class="console-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span class="console-title">neon-drift.html</span>
+          <a class="console-open" href="demos/neon-drift.html" target="_blank" rel="noopener">Open fullscreen</a>
+        </div>
+        <div class="console-screen" id="console-screen">
+          <button class="console-start" id="console-start" type="button">
+            <span class="play-icon" aria-hidden="true"></span>
+            <span>Load Neon Drift</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── Work ───────────── -->
+    <section class="section work" id="work" aria-labelledby="work-title">
+      <div class="section-head">
+        <h2 id="work-title">Things I've shipped</h2>
+        <p>Every project has a working demo. No screenshots pretending to be products.</p>
+      </div>
+
+      <div class="filters" role="group" aria-label="Filter projects" id="filters">
+        <button type="button" class="chip is-on" data-filter="all" aria-pressed="true">All</button>
+        <button type="button" class="chip" data-filter="Game" aria-pressed="false">Games</button>
+        <button type="button" class="chip" data-filter="Web App" aria-pressed="false">Web apps</button>
+        <button type="button" class="chip" data-filter="Tool" aria-pressed="false">Tools</button>
+        <button type="button" class="chip" data-filter="Experiment" aria-pressed="false">Experiments</button>
+      </div>
+
+      <ul class="projects" id="projects"></ul>
+    </section>
+
+    <!-- ───────────── Craft ───────────── -->
+    <section class="section craft" id="craft" aria-labelledby="craft-title">
+      <div class="section-head">
+        <h2 id="craft-title">Five ways I spend my time</h2>
+        <p>They feed each other. Games teach me what feels good, the web teaches me how to ship, and the camera keeps me honest.</p>
+      </div>
+
+      <div class="bento">
+        <article class="tile tile-web">
+          <h3>Web development</h3>
+          <p>Fast, accessible sites that load before you blink. HTML, CSS and JavaScript first, then React and Next.js when the project needs them.</p>
+          <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li><li>TypeScript</li><li>React</li><li>Next.js</li></ul>
+        </article>
+
+        <article class="tile tile-game">
+          <h3>Game development</h3>
+          <p>Small, replayable games with tight controls. I start with the feel of one button and build outward from there.</p>
+          <ul class="tags"><li>Canvas</li><li>Game loops</li><li>Unity</li><li>Godot</li></ul>
+        </article>
+
+        <article class="tile tile-app">
+          <h3>App development</h3>
+          <p>Installable apps that work offline and feel native on a phone.</p>
+          <ul class="tags"><li>PWA</li><li>React Native</li><li>Flutter</li></ul>
+        </article>
+
+        <article class="tile tile-content">
+          <h3>Content creation</h3>
+          <p>Devlogs, build-with-me videos and short clips. I record the messy middle, not just the finished thing.</p>
+          <a class="link" data-link="youtube" href="#contact">Watch on YouTube</a>
+        </article>
+
+        <article class="tile tile-gaming">
+          <h3>Gaming</h3>
+          <p>Where most of my ideas start. Right now I'm playing:</p>
+          <ul class="playing" id="playing"></ul>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────────── About ───────────── -->
+    <section class="section about" id="about" aria-labelledby="about-title">
+      <div class="about-grid">
+        <div>
+          <h2 id="about-title">Hi, I'm Umbra</h2>
+          <p class="prose">I'm a developer who learned the web by breaking it on purpose. That curiosity turned into a habit: build a small thing, learn one new trick, ship it, repeat.</p>
+          <p class="prose">I like projects where code, design and play meet. A timer that feels calm. A game you can restart in a heartbeat. A portfolio that you can actually use.</p>
+          <p class="prose">When I'm not coding, I'm gaming, editing videos, or sketching the next idea on whatever's nearby.</p>
+
+          <h3 class="sub">How I work</h3>
+          <dl class="principles">
+            <div><dt>Ship small, ship often</dt><dd>A finished small project teaches more than a perfect unfinished one.</dd></div>
+            <div><dt>Make it accessible</dt><dd>Keyboard, contrast and screen readers are part of done.</dd></div>
+            <div><dt>Respect load time</dt><dd>Fast pages respect people's time and data plans.</dd></div>
+          </dl>
+        </div>
+
+        <div>
+          <h3 class="sub first">Journey</h3>
+          <ol class="timeline">
+            <li>
+              <span class="when">2026 – now</span>
+              <strong>Building in public</strong>
+              <p>Shipping one project at a time, with live demos, source code and devlogs.</p>
+            </li>
+            <li>
+              <span class="when">2025 – 2026</span>
+              <strong>Going full-stack</strong>
+              <p>Moved from tutorials to self-directed projects with Next.js, TypeScript and real deployments.</p>
+            </li>
+            <li>
+              <span class="when">2024 – 2025</span>
+              <strong>First lines of code</strong>
+              <p>Started with HTML, CSS and JavaScript, building tiny pages and breaking them on purpose.</p>
+            </li>
+          </ol>
+
+          <h3 class="sub">Toolbox</h3>
+          <div class="toolbox">
+            <div><h4>Languages</h4><p>JavaScript, TypeScript, HTML, CSS, C#, Python</p></div>
+            <div><h4>Frameworks</h4><p>React, Next.js, Node.js, Tailwind CSS</p></div>
+            <div><h4>Game and app</h4><p>Canvas, Unity, Godot, PWA</p></div>
+            <div><h4>Creative</h4><p>OBS, DaVinci Resolve, Figma</p></div>
+          </div>
+
+          <h3 class="sub">Learning right now</h3>
+          <ul class="learning">
+            <li>3D on the web with Three.js and WebGL</li>
+            <li>Server components and backend basics</li>
+            <li>Unity game architecture</li>
+            <li>Automated testing</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────── Contact ───────────── -->
+    <section class="section contact" id="contact" aria-labelledby="contact-title">
+      <div class="contact-card">
+        <h2 id="contact-title">Got something worth building?</h2>
+        <p>Tell me what you're making: a site, an app, a game jam team-up or a video idea. I usually reply within a couple of days.</p>
+
+        <div class="contact-actions">
+          <a class="btn btn-primary" id="mail-btn" data-link="email" href="#contact">Email me</a>
+          <button class="btn btn-ghost" id="copy-email" type="button">Copy email address</button>
+        </div>
+        <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+
+        <ul class="socials" id="socials"></ul>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>© <span id="year"></span> Umbra. Built by hand with HTML, CSS and a little JavaScript.</p>
+    <p><a href="#top">Back to top</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
