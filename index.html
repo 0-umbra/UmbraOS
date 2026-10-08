@@ -33,12 +33,27 @@
       <span>umbra</span>
     </a>
     <nav class="nav" aria-label="Main">
-      <a href="#play">Play</a>
-      <a href="#work">Work</a>
-      <a href="#craft">What I make</a>
+      <a href="#play">Games</a>
+      <a href="#work">My work</a>
+      <a href="#services">Services</a>
+      <a href="#pricing">Pricing</a>
       <a href="#about">About</a>
       <a href="#contact" class="nav-cta">Contact</a>
     </nav>
+    <button class="menu-toggle" id="menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+    <a class="header-contact" href="#contact">Contact</a>
+    <div class="mobile-menu" id="mobile-menu" aria-hidden="true">
+      <a href="#top">Home</a>
+      <a href="#play">Games</a>
+      <a href="#work">My work</a>
+      <a href="#services">Services</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#process">How it works</a>
+      <a href="#about">About me</a>
+      <a href="#contact">Contact</a>
+    </div>
   </header>
 
   <main id="main">
@@ -96,6 +111,105 @@
       </div>
 
       <ul class="projects" id="projects"></ul>
+    </section>
+
+    <!-- ───────────── Services ───────────── -->
+    <section class="section services" id="services" aria-labelledby="services-title">
+      <div class="section-head">
+        <p class="eyebrow">Need something built?</p>
+        <h2 id="services-title">Websites that look good and actually work.</h2>
+        <p>I can build fast, mobile-friendly websites for creators, gamers, small businesses and personal brands — from a simple landing page to a full interactive experience.</p>
+      </div>
+
+      <div class="service-grid">
+        <article class="service-card">
+          <span class="service-number">01</span>
+          <h3>Landing pages</h3>
+          <p>Clean one-page sites for portfolios, creators, events, products and small businesses.</p>
+        </article>
+        <article class="service-card">
+          <span class="service-number">02</span>
+          <h3>Business websites</h3>
+          <p>Multi-section websites with contact details, services, galleries, forms and a professional look.</p>
+        </article>
+        <article class="service-card">
+          <span class="service-number">03</span>
+          <h3>Interactive & 3D</h3>
+          <p>More ambitious sites with animations, interactive scenes, WebGL/Three.js and custom experiences.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────────── Pricing ───────────── -->
+    <section class="section pricing" id="pricing" aria-labelledby="pricing-title">
+      <div class="section-head">
+        <p class="eyebrow">Simple website packages</p>
+        <h2 id="pricing-title">Choose how far you want to take it.</h2>
+        <p>Starting prices in INR. Final pricing depends on the exact pages, features and content. Domain registration/renewal fees may be separate when a paid domain is requested.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <article class="price-card">
+          <div class="price-top"><span>Starter</span><span class="price-badge">01</span></div>
+          <h3>₹999</h3>
+          <p class="price-sub">For a simple online presence.</p>
+          <ul>
+            <li>✓ 1-page responsive website</li>
+            <li>✓ Custom design</li>
+            <li>✓ Mobile + desktop support</li>
+            <li>✓ Basic animations</li>
+            <li>✓ Free hosting setup</li>
+            <li class="muted-item">— Custom domain not included</li>
+          </ul>
+          <a class="btn btn-ghost price-btn" data-plan="Starter — ₹999" href="#contact">Choose Starter</a>
+        </article>
+
+        <article class="price-card featured">
+          <div class="popular">Most popular</div>
+          <div class="price-top"><span>Pro</span><span class="price-badge">02</span></div>
+          <h3>₹2,499</h3>
+          <p class="price-sub">For creators and growing businesses.</p>
+          <ul>
+            <li>✓ Up to 4 sections/pages</li>
+            <li>✓ Custom design + animations</li>
+            <li>✓ Mobile + desktop support</li>
+            <li>✓ Contact / enquiry setup</li>
+            <li>✓ Custom domain setup</li>
+            <li>✓ Free hosting setup</li>
+          </ul>
+          <a class="btn btn-primary price-btn" data-plan="Pro — ₹2,499" href="#contact">Choose Pro</a>
+        </article>
+
+        <article class="price-card premium">
+          <div class="price-top"><span>Ultimate</span><span class="price-badge">03</span></div>
+          <h3>₹4,999+</h3>
+          <p class="price-sub">For a standout interactive website.</p>
+          <ul>
+            <li>✓ Custom multi-page experience</li>
+            <li>✓ Custom domain setup</li>
+            <li>✓ Advanced animations</li>
+            <li>✓ 3D / Three.js experience</li>
+            <li>✓ Advanced interactions</li>
+            <li>✓ Performance + mobile optimization</li>
+          </ul>
+          <a class="btn btn-ghost price-btn" data-plan="Ultimate — ₹4,999+" href="#contact">Choose Ultimate</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- ───────────── Process ───────────── -->
+    <section class="section process" id="process" aria-labelledby="process-title">
+      <div class="section-head">
+        <p class="eyebrow">How it works</p>
+        <h2 id="process-title">From idea to live website.</h2>
+        <p>A simple process so you always know what happens next.</p>
+      </div>
+      <div class="process-grid">
+        <article><span>01</span><h3>Tell me the idea</h3><p>Send your goals, references, pages and features you want.</p></article>
+        <article><span>02</span><h3>Design & build</h3><p>I turn the idea into a responsive website and keep the experience fast.</p></article>
+        <article><span>03</span><h3>Review</h3><p>You test it on your phone or computer and request changes.</p></article>
+        <article><span>04</span><h3>Launch</h3><p>Once everything is ready, the final site is deployed and handed over.</p></article>
+      </div>
     </section>
 
     <!-- ───────────── Craft ───────────── -->
@@ -202,6 +316,7 @@
 
         <div class="contact-actions">
           <a class="btn btn-primary" id="mail-btn" data-link="email" href="#contact">Email me</a>
+          <a class="btn btn-ghost" href="#pricing">See pricing</a>
           <button class="btn btn-ghost" id="copy-email" type="button">Copy email address</button>
         </div>
         <p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>

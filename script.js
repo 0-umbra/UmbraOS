@@ -268,12 +268,57 @@ function setupEclipse() {
   start();
 }
 
+/* ───────────────────────── Navigation menu ───────────────────────── */
+function setupMenu() {
+  const toggle = document.getElementById("menu-toggle");
+  const menu = document.getElementById("mobile-menu");
+  if (!toggle || !menu) return;
+
+  const close = () => {
+    toggle.classList.remove("is-open");
+    toggle.setAttribute("aria-expanded", "false");
+    toggle.setAttribute("aria-label", "Open menu");
+    menu.classList.remove("is-open");
+    menu.setAttribute("aria-hidden", "true");
+  };
+
+  toggle.addEventListener("click", () => {
+    const open = !menu.classList.contains("is-open");
+    toggle.classList.toggle("is-open", open);
+    toggle.setAttribute("aria-expanded", String(open));
+    toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    menu.classList.toggle("is-open", open);
+    menu.setAttribute("aria-hidden", String(!open));
+  });
+
+  menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", close));
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+}
+
+/* ───────────────────────── Pricing CTAs ───────────────────────── */
+function setupPricing() {
+  document.querySelectorAll(".price-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const plan = btn.dataset.plan || "Website package";
+      const subject = encodeURIComponent(`Website enquiry — ${plan}`);
+      const body = encodeURIComponent(`Hi Umbra,\n\nI'm interested in the ${plan} package.\n\nHere is what I want to build:\n`);
+      window.location.href = `mailto:${CONFIG.email}?subject=${subject}&body=${body}`;
+    });
+  });
+}
+
 /* ───────────────────────── Boot ───────────────────────── */
-document.getElementById("year").textContent = new Date().getFullYear();
-renderProjects();
-setupFilters();
-renderPlaying();
-renderSocials();
-setupConsole();
-setupCopy();
-setupEclipse();
+document.addEventListener("DOMContentLoaded", () => {
+  const year = document.getElementById("year");
+  if (year) year.textContent = new Date().getFullYear();
+  renderProjects();
+  setupFilters();
+  renderPlaying();
+  renderSocials();
+  setupConsole();
+  setupCopy();
+  setupEclipse();
+  setupMenu();
+  setupPricing();
+});
