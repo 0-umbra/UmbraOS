@@ -44,7 +44,10 @@
     <a href="#services">Services</a>
     <a href="#pricing">Pricing</a>
     <a href="#process">How it works</a>
+    <a href="#building">Currently building</a>
+    <a href="#behind">Behind the build</a>
     <a href="#about">About me</a>
+    <a href="#faq">FAQ</a>
     <a href="#contact">Contact</a>
   </nav>
 </header>
@@ -64,6 +67,16 @@
         </div>
       </div>
       <p class="hero-hint" id="hero-hint">Move your cursor to move the moon.</p>
+    </section>
+
+    <!-- ───────────── Quick stats ───────────── -->
+    <section class="section stats-section" aria-label="Umbra stats">
+      <div class="stats-grid reveal">
+        <div><strong>05</strong><span>live demos</span></div>
+        <div><strong>03</strong><span>ways I build</span></div>
+        <div><strong>100%</strong><span>browser-first</span></div>
+        <div><strong>∞</strong><span>ideas in progress</span></div>
+      </div>
     </section>
 
     <!-- ───────────── Play ───────────── -->
@@ -106,6 +119,23 @@
       <ul class="projects" id="projects"></ul>
     </section>
 
+    <!-- ───────────── Project detail modal ───────────── -->
+    <div class="project-modal" id="project-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="project-modal-title">
+      <div class="modal-panel">
+        <button class="modal-close" type="button" data-modal-close aria-label="Close project details">×</button>
+        <div class="project-preview" aria-hidden="true"><span></span></div>
+        <p class="eyebrow" data-modal-category>Project</p>
+        <h2 id="project-modal-title" data-modal-title>Project</h2>
+        <p class="modal-blurb" data-modal-blurb></p>
+        <h3>Built with</h3>
+        <ul class="modal-tech" data-modal-tech></ul>
+        <div class="modal-actions">
+          <a class="btn btn-primary" data-modal-demo href="#" target="_blank" rel="noopener">Open live demo</a>
+          <button class="btn btn-ghost" type="button" data-modal-close>Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- ───────────── Services ───────────── -->
     <section class="section services" id="services" aria-labelledby="services-title">
       <div class="section-head">
@@ -115,17 +145,17 @@
       </div>
 
       <div class="service-grid">
-        <article class="service-card">
+        <article class="service-card reveal">
           <span class="service-number">01</span>
           <h3>Landing pages</h3>
           <p>Clean one-page sites for portfolios, creators, events, products and small businesses.</p>
         </article>
-        <article class="service-card">
+        <article class="service-card reveal">
           <span class="service-number">02</span>
           <h3>Business websites</h3>
           <p>Multi-section websites with contact details, services, galleries, forms and a professional look.</p>
         </article>
-        <article class="service-card">
+        <article class="service-card reveal">
           <span class="service-number">03</span>
           <h3>Interactive & 3D</h3>
           <p>More ambitious sites with animations, interactive scenes, WebGL/Three.js and custom experiences.</p>
@@ -142,7 +172,7 @@
       </div>
 
       <div class="pricing-grid">
-        <article class="price-card">
+        <article class="price-card reveal">
           <div class="price-top"><span>Starter</span><span class="price-badge">01</span></div>
           <h3>₹999</h3>
           <p class="price-sub">For a simple online presence.</p>
@@ -157,7 +187,7 @@
           <a class="btn btn-ghost price-btn" data-plan="Starter — ₹999" href="#contact">Choose Starter</a>
         </article>
 
-        <article class="price-card featured">
+        <article class="price-card featured reveal">
           <div class="popular">Most popular</div>
           <div class="price-top"><span>Pro</span><span class="price-badge">02</span></div>
           <h3>₹2,499</h3>
@@ -173,7 +203,7 @@
           <a class="btn btn-primary price-btn" data-plan="Pro — ₹2,499" href="#contact">Choose Pro</a>
         </article>
 
-        <article class="price-card premium">
+        <article class="price-card premium reveal">
           <div class="price-top"><span>Ultimate</span><span class="price-badge">03</span></div>
           <h3>₹4,999+</h3>
           <p class="price-sub">For a standout interactive website.</p>
@@ -198,10 +228,33 @@
         <p>A simple process so you always know what happens next.</p>
       </div>
       <div class="process-grid">
-        <article><span>01</span><h3>Tell me the idea</h3><p>Send your goals, references, pages and features you want.</p></article>
-        <article><span>02</span><h3>Design & build</h3><p>I turn the idea into a responsive website and keep the experience fast.</p></article>
-        <article><span>03</span><h3>Review</h3><p>You test it on your phone or computer and request changes.</p></article>
-        <article><span>04</span><h3>Launch</h3><p>Once everything is ready, the final site is deployed and handed over.</p></article>
+        <article class="reveal"><span>01</span><h3>Tell me the idea</h3><p>Send your goals, references, pages and features you want.</p></article>
+        <article class="reveal"><span>02</span><h3>Design & build</h3><p>I turn the idea into a responsive website and keep the experience fast.</p></article>
+        <article class="reveal"><span>03</span><h3>Review</h3><p>You test it on your phone or computer and request changes.</p></article>
+        <article class="reveal"><span>04</span><h3>Launch</h3><p>Once everything is ready, the final site is deployed and handed over.</p></article>
+      </div>
+    </section>
+
+    <!-- ───────────── Currently building ───────────── -->
+    <section class="section building" id="building" aria-labelledby="building-title">
+      <div class="section-head reveal">
+        <p class="eyebrow">Currently building</p>
+        <h2 id="building-title">Not everything is finished yet.</h2>
+        <p>The best part of building is showing the work while it is still becoming something.</p>
+      </div>
+      <div class="building-grid">
+        <article class="building-card reveal">
+          <span class="status-pill"><i></i> In development</span>
+          <h3>ANUMBRIX</h3>
+          <p>An anime discovery platform focused on helping viewers find shows, track what they watch and explore recommendations.</p>
+          <div class="tags"><span>Web app</span><span>Anime</span><span>Discovery</span></div>
+        </article>
+        <article class="building-card reveal">
+          <span class="status-pill warm"><i></i> Exploring</span>
+          <h3>Rewarder</h3>
+          <p>A rewards-focused web app concept, being shaped around simple community features and a mobile-first experience.</p>
+          <div class="tags"><span>Web app</span><span>Rewards</span><span>Mobile-first</span></div>
+        </article>
       </div>
     </section>
 
@@ -213,31 +266,31 @@
       </div>
 
       <div class="bento">
-        <article class="tile tile-web">
+        <article class="tile tile-web reveal">
           <h3>Web development</h3>
           <p>Fast, accessible sites that load before you blink. HTML, CSS and JavaScript first, then React and Next.js when the project needs them.</p>
           <ul class="tags"><li>HTML</li><li>CSS</li><li>JavaScript</li><li>TypeScript</li><li>React</li><li>Next.js</li></ul>
         </article>
 
-        <article class="tile tile-game">
+        <article class="tile tile-game reveal">
           <h3>Game development</h3>
           <p>Small, replayable games with tight controls. I start with the feel of one button and build outward from there.</p>
           <ul class="tags"><li>Canvas</li><li>Game loops</li><li>Unity</li><li>Godot</li></ul>
         </article>
 
-        <article class="tile tile-app">
+        <article class="tile tile-app reveal">
           <h3>App development</h3>
           <p>Installable apps that work offline and feel native on a phone.</p>
           <ul class="tags"><li>PWA</li><li>React Native</li><li>Flutter</li></ul>
         </article>
 
-        <article class="tile tile-content">
+        <article class="tile tile-content reveal">
           <h3>Content creation</h3>
           <p>Devlogs, build-with-me videos and short clips. I record the messy middle, not just the finished thing.</p>
           <a class="link" data-link="youtube" href="#contact">Watch on YouTube</a>
         </article>
 
-        <article class="tile tile-gaming">
+        <article class="tile tile-gaming reveal">
           <h3>Gaming</h3>
           <p>Where most of my ideas start. Right now I'm playing:</p>
           <ul class="playing" id="playing"></ul>
@@ -301,11 +354,60 @@
       </div>
     </section>
 
-    <!-- ───────────── Contact ───────────── -->
+    <!-- ───────────── Behind the build ───────────── -->
+    <section class="section behind" id="behind" aria-labelledby="behind-title">
+      <div class="section-head reveal">
+        <p class="eyebrow">Behind the build</p>
+        <h2 id="behind-title">From “what if?” to “it's live.”</h2>
+        <p>A peek at the loop I use for games, websites and experiments.</p>
+      </div>
+      <div class="build-track">
+        <article class="reveal"><span>01</span><h3>Idea</h3><p>Start with a problem, a weird idea, or something I simply want to try.</p></article>
+        <article class="reveal"><span>02</span><h3>Prototype</h3><p>Build the smallest version that proves the idea can actually work.</p></article>
+        <article class="reveal"><span>03</span><h3>Polish</h3><p>Fix the rough edges, improve the interaction and make it feel good on a phone.</p></article>
+        <article class="reveal"><span>04</span><h3>Ship</h3><p>Put it online, test it with real people, learn what breaks and keep improving.</p></article>
+      </div>
+    </section>
+
+    <!-- ───────────── FAQ ───────────── -->
+    <section class="section faq" id="faq" aria-labelledby="faq-title">
+      <div class="section-head reveal">
+        <p class="eyebrow">Questions</p>
+        <h2 id="faq-title">Before we build.</h2>
+      </div>
+      <div class="faq-list">
+        <details class="reveal"><summary>Can you build a website for a phone-first audience?</summary><p>Yes. I design around small screens first and then scale the layout up for tablets and desktop.</p></details>
+        <details class="reveal"><summary>Can I use my own domain?</summary><p>Yes. Domain setup is included in the Pro and Ultimate packages. The domain registration or renewal cost itself is separate if the domain is paid.</p></details>
+        <details class="reveal"><summary>Can you make a 3D website?</summary><p>Yes. The Ultimate package can include interactive 3D or Three.js experiences when the project needs them.</p></details>
+        <details class="reveal"><summary>How do I start a project?</summary><p>Use the project form below, choose the closest budget, and describe what you want to build. It opens an email with the details ready to send.</p></details>
+      </div>
+    </section>
+
+    <!-- ───────────── Contact ───────────── -->    <!-- ───────────── Contact ───────────── -->
     <section class="section contact" id="contact" aria-labelledby="contact-title">
       <div class="contact-card">
         <h2 id="contact-title">Got something worth building?</h2>
         <p>Tell me what you're making: a site, an app, a game jam team-up or a video idea. I usually reply within a couple of days.</p>
+
+        <form class="inquiry-form" id="inquiry-form">
+          <div class="form-row">
+            <label>Name<input name="name" autocomplete="name" required placeholder="Your name" /></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required placeholder="you@example.com" /></label>
+          </div>
+          <div class="form-row">
+            <label>What are you building?
+              <select name="type">
+                <option>Portfolio website</option><option>Business website</option><option>Landing page</option><option>Web app</option><option>Game</option><option>3D / interactive website</option><option>Something else</option>
+              </select>
+            </label>
+            <label>Budget
+              <select name="budget"><option>₹999–₹2,499</option><option>₹2,500–₹4,999</option><option>₹5,000+</option><option>Not sure yet</option></select>
+            </label>
+          </div>
+          <label>Tell me about the project<textarea name="details" rows="5" required placeholder="What do you want the website to do?"></textarea></label>
+          <button class="btn btn-primary" type="submit">Start a project →</button>
+          <p class="form-status" id="inquiry-status" role="status" aria-live="polite"></p>
+        </form>
 
         <div class="contact-actions">
           <a class="btn btn-primary" id="mail-btn" data-link="email" href="#contact">Email me</a>

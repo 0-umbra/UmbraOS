@@ -88,9 +88,48 @@ function renderProjects() {
         <ul class="tech">${p.tech.map((t) => `<li>${t}</li>`).join("")}</ul>
       </div>
       <div class="links">
+        <button class="btn btn-ghost project-details" type="button" data-project="${p.name}">Details</button>
         <a class="btn btn-primary" href="${p.demo}" target="_blank" rel="noopener">${p.category === "Game" ? "Play it" : "Open demo"}</a>
       </div>
     </li>`).join("");
+}
+
+function setupProjectDetails() {
+  const modal = document.getElementById("project-modal");
+  if (!modal) return;
+  const title = modal.querySelector("[data-modal-title]");
+  const category = modal.querySelector("[data-modal-category]");
+  const blurb = modal.querySelector("[data-modal-blurb]");
+  const tech = modal.querySelector("[data-modal-tech]");
+  const demo = modal.querySelector("[data-modal-demo]");
+  const closeButtons = modal.querySelectorAll("[data-modal-close]");
+
+  const close = () => {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("modal-open");
+  };
+
+  document.addEventListener("click", (e) => {
+    const button = e.target.closest(".project-details");
+    if (!button) return;
+    const project = PROJECTS.find((p) => p.name === button.dataset.project);
+    if (!project) return;
+    title.textContent = project.name;
+    category.textContent = KIND_LABEL[project.category] || project.category;
+    blurb.textContent = project.blurb;
+    tech.innerHTML = project.tech.map((t) => `<li>${t}</li>`).join("");
+    demo.href = project.demo;
+    demo.textContent = project.category === "Game" ? "Play the game" : "Open live demo";
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("modal-open");
+    closeButtons[0]?.focus();
+  });
+
+  closeButtons.forEach((button) => button.addEventListener("click", close));
+  modal.addEventListener("click", (e) => { if (e.target === modal) close(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
 }
 
 function setupFilters() {
@@ -313,12 +352,49 @@ function setupPricing() {
   });
 }
 
+function setupInquiryForm() {
+  const form = document.getElementById("inquiry-form");
+  const status = document.getElementById("inquiry-status");
+  if (!form) return;
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const name = String(data.get("name") || "").trim();
+    const email = String(data.get("email") || "").trim();
+    const type = String(data.get("type") || "Website");
+    const budget = String(data.get("budget") || "Not specified");
+    const details = String(data.get("details") || "").trim();
+    const subject = encodeURIComponent(`Website project enquiry — ${type}`);
+    const body = encodeURIComponent(`Hi Umbra,\n\nName: ${name}\nEmail: ${email}\nProject: ${type}\nBudget: ${budget}\n\nProject details:\n${details}\n\nSent from the Umbra portfolio.`);
+    status.textContent = "Opening your email app…";
+    window.location.href = `mailto:${CONFIG.email}?subject=${subject}&body=${body}`;
+  });
+}
+
+function setupScrollReveal() {
+  const items = document.querySelectorAll(".reveal");
+  if (!items.length || !("IntersectionObserver" in window)) {
+    items.forEach((item) => item.classList.add("is-visible"));
+    return;
+  }
+  const observer = new IntersectionObserver((entries, obs) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("is-visible");
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  items.forEach((item) => observer.observe(item));
+}
+
 /* ───────────────────────── Boot ───────────────────────── */
 document.addEventListener("DOMContentLoaded", () => {
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
   renderProjects();
   setupFilters();
+  setupProjectDetails();
   renderPlaying();
   renderSocials();
   setupConsole();
@@ -326,4 +402,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupEclipse();
   setupMenu();
   setupPricing();
+  setupInquiryForm();
+  setupScrollReveal();
 });
