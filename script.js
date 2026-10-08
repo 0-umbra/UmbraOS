@@ -293,6 +293,11 @@ function setupMenu() {
 
   menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", close));
   document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+  document.addEventListener("click", (e) => {
+    if (!menu.classList.contains("is-open")) return;
+    if (!menu.contains(e.target) && !toggle.contains(e.target)) close();
+  });
+  window.addEventListener("resize", () => { if (window.innerWidth > 900) close(); });
 }
 
 /* ───────────────────────── Pricing CTAs ───────────────────────── */
