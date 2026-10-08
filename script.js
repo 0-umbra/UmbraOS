@@ -89,7 +89,6 @@ function renderProjects() {
       </div>
       <div class="links">
         <a class="btn btn-primary" href="${p.demo}" target="_blank" rel="noopener">${p.category === "Game" ? "Play it" : "Open demo"}</a>
-        <a class="btn btn-ghost" href="https://github.com/${CONFIG.githubUser}/${p.repo}" target="_blank" rel="noopener">Source</a>
       </div>
     </li>`).join("");
 }
