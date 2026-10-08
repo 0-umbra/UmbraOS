@@ -27,10 +27,14 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: 84px; }
+html { scroll-behavior: smooth; scroll-padding-top: 84px; overflow-x: hidden; }
 body {
   margin: 0;
-  background: var(--night);
+  min-width: 0;
+  background:
+    radial-gradient(900px 600px at 82% 8%, rgb(124 134 255 / 0.10), transparent 62%),
+    radial-gradient(800px 520px at 15% 38%, rgb(255 179 71 / 0.055), transparent 64%),
+    linear-gradient(180deg, #08080f 0%, #0a0913 45%, #08080f 100%);
   color: var(--text);
   font-family: var(--font-display);
   font-size: 1.0625rem;

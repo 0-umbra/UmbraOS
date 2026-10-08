@@ -21,7 +21,7 @@ const CONFIG = {
   },
 
   // EDIT: the games you're playing right now
-  playing: ["Minecraft", "Valorant", "PUBG", "Call Of Duty]
+  playing: ["Minecraft", "Valorant", "PUBG", "Call Of Duty"]
 };
 
 /* ═══════════════════════════════════════════════════════════
@@ -137,7 +137,6 @@ function setupConsole() {
     frame.src = "demos/neon-drift.html";
     frame.title = "Neon Drift, a playable one-button drift racer";
     frame.allow = "fullscreen";
-    frame.loading = "lazy";
     screen.replaceChildren(frame);
     frame.focus();
   });
